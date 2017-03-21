@@ -38,6 +38,19 @@ class Player
     static Tuple<int, int> CenterPoint;
     #endregion
 
+    //static IEnumerable<Tuple<int,int>> getPossiblePoints()
+    //{
+    //    for (int i = 0; i < MAZE.GetLength(0); i++)
+    //    {
+    //        for (int j = 0; j < MAZE.GetLength(1); j++)
+    //        {
+    //            if(MAZE[i,j] == '.')
+    //            {
+
+    //            }
+    //        }
+    //    }
+    //}
 
     static void Main(string[] args)
     {
@@ -69,10 +82,19 @@ class Player
             if (!FoundCommandCenter)
             {
                 // Explore
+                if (CenterPoint != null)
+                {
+                    // TODO: Goto C
+                }
+                else
+                {
+
+                }
             }
             else
             {
-                // GetBack
+                // Get back
+                // TODO: Goto T
             }
 
             Console.WriteLine("RIGHT"); // Kirk's next move (UP DOWN LEFT or RIGHT).
