@@ -5,7 +5,7 @@ using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 
-class Player
+public class Player
 {
     #region Auxilary methods
     static void TryCatch(Action a) { try { a(); } catch (Exception) { } }
@@ -93,8 +93,9 @@ class Player
     /// <summary>
     /// Score a distance between 2 points for A* algo
     /// </summary>
-    //static double DistanceScore(Tuple<int, int> p1, Tuple<int, int> p2) => Math.Sqrt((p1.Item1 - p2.Item1) * (p1.Item1 - p2.Item1) + (p1.Item2 - p2.Item2) * (p1.Item2 - p2.Item2));
-    static double DistanceScore(Tuple<int, int> p1, Tuple<int, int> p2) => Math.Abs(p1.Item1 - p2.Item1) + Math.Abs(p1.Item2 - p2.Item2);
+    static double DistanceScoreSqr(Tuple<int, int> p1, Tuple<int, int> p2) => Math.Sqrt((p1.Item1 - p2.Item1) * (p1.Item1 - p2.Item1) + (p1.Item2 - p2.Item2) * (p1.Item2 - p2.Item2));
+    static double DistanceScoreLin(Tuple<int, int> p1, Tuple<int, int> p2) => Math.Abs(p1.Item1 - p2.Item1) + Math.Abs(p1.Item2 - p2.Item2);
+    static double DistanceScore(Tuple<int, int> p1, Tuple<int, int> p2) => DistanceScoreSqr(p1, p2); // Only for exploration
 
     /// <summary>
     /// Get add accessible neibors for a point
@@ -119,11 +120,11 @@ class Player
     /// <summary>
     /// Implements A* to find the shortest way between two points
     /// </summary>
-    static List<Tuple<int, int>> GetShortestWay(Tuple<int, int> from, Tuple<int, int> to, bool accurate = false)
+    static List<Tuple<int, int>> GetShortestWay(Tuple<int, int> from, Tuple<int, int> to, Func<Tuple<int, int>, Tuple<int, int>, double> distCalc, bool accurate = false)
     {
         bool pathFound = false;
-        var pathNodes = new List<Tuple<int, int>>();
-        var allNodes = new List<Tuple<int, int>>();
+        var pathNodes = new HashSet<Tuple<int, int>>();
+        var allNodes = new HashSet<Tuple<int, int>>();
         var cameFrom = new Dictionary<Tuple<int, int>, Tuple<int, int>>();
         var nodeScore = new Dictionary<Tuple<int, int>, int>();
         pathNodes.Add(from);
@@ -141,7 +142,7 @@ class Player
                 if (!cameFrom.ContainsKey(node) || nodeScore[currentPoint] < nodeScore[cameFrom[node]])
                 {
                     cameFrom[node] = currentPoint;
-                    nodeScore[node] = nodeScore[currentPoint] + ((accurate) ? (int)DistanceScore(to, node) : 1);
+                    nodeScore[node] = nodeScore[currentPoint] + 1;
                 }
                 if (!allNodes.Contains(node))
                 {
@@ -151,13 +152,16 @@ class Player
             }
             if (pathNodes.Count == 0) // No path
                 break;
-            currentPoint = pathNodes.OrderBy(x => DistanceScore(x, to)).First();
+            currentPoint = pathNodes.OrderBy(x => distCalc(x, to) + nodeScore[x]).First();
 
-            if ((currentPoint == to || DistanceScore(to, currentPoint) == 0))
+            if (currentPoint.Item1 == to.Item1 && currentPoint.Item2 == to.Item2)
             {
-                //Deb($"  [A*]: Got the target. Node score {nodeScore[currentPoint]}");
-                pathFound = true;
-                break;
+                Deb($"  [A*]: Got the target. Node score {nodeScore[currentPoint]}");
+                if (!accurate || nodeScore[currentPoint] <= AlarmCooldown)
+                {
+                    pathFound = true;
+                    break;
+                }
             }
         }
         if (!pathFound)
@@ -185,7 +189,7 @@ class Player
             DebList(exploreOptions);
             foreach (var option in exploreOptions)
             {
-                var path = GetShortestWay(new Tuple<int, int>(currentRow, currentCol), option);
+                var path = GetShortestWay(new Tuple<int, int>(currentRow, currentCol), option, DistanceScore);
                 if (path != null)
                 {
                     var nextPoint = path[0];
@@ -206,14 +210,14 @@ class Player
         }
     }
 
-    static void Main(string[] args)
+    public static void Main(string[] args)
     {
         string[] inputs;
         inputs = Console.ReadLine().Split(' ');
         int rowsCount = int.Parse(inputs[0]); // number of rows.
         int colsCount = int.Parse(inputs[1]); // number of columns.
         AlarmCooldown = int.Parse(inputs[2]); // number of rounds between the time the alarm countdown is activated and the time the alarm goes off.
-        //Deb($"The maze has {rowsCount} rows and {colsCount} cols");
+        Deb($"The maze has {rowsCount} rows and {colsCount} cols. Alert is {AlarmCooldown}");
         MAZE = new char[rowsCount, colsCount];
         while (true) // game loop
         {
@@ -243,7 +247,7 @@ class Player
             {
                 if (CenterPoint != null) // Go strait to command center
                 {
-                    var path = GetShortestWay(new Tuple<int, int>(currentRow, currentCol), CenterPoint);
+                    var path = GetShortestWay(new Tuple<int, int>(currentRow, currentCol), CenterPoint, DistanceScore);
                     if (path == null)
                     {
                         Deb("Can't reach center");
@@ -263,9 +267,11 @@ class Player
             }
             else // Get back
             {
-                var path = GetShortestWay(new Tuple<int, int>(currentRow, currentCol), StartPoint);
+                var path1 = GetShortestWay(new Tuple<int, int>(currentRow, currentCol), StartPoint, DistanceScoreSqr, true);
+                var path2 = GetShortestWay(new Tuple<int, int>(currentRow, currentCol), StartPoint, DistanceScoreLin, true);
+                var path = (path1.Count > path2.Count) ? path2 : path1;
                 var nextPoint = path[0];
-                Deb($"Go back to {nextPoint}. Turns left {path.Count}");
+                Deb($"Go back to {nextPoint}. Turns left {path.Count}. Alert in {AlarmCooldown}");
                 Console.WriteLine(GetDirection(new Tuple<int, int>(currentRow, currentCol), nextPoint));
                 foreach (var point in path)
                     MAZE[point.Item1, point.Item2] = '*';
