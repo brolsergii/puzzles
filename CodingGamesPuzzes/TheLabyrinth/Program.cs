@@ -41,7 +41,7 @@ class Player
     /// <summary>
     /// Check if the bot can access the case
     /// </summary>
-    static bool IsCaseAccessible(int i, int j) => (MAZE[i, j] != '#');
+    static bool IsCaseAccessible(int i, int j) => (MAZE[i, j] == '.' || MAZE[i, j] == 'T' || MAZE[i, j] == 'C');
 
     /// <summary>
     /// Gets all possible points to explore
@@ -140,6 +140,8 @@ class Player
                     pathNodes.Add(node);
                 }
             }
+            if (pathNodes.Count == 0) // No path
+                break;
             currentPoint = pathNodes.OrderBy(x => DistanceScore(x, to)).First();
             if (currentPoint == to || DistanceScore(to, currentPoint) == 0)
             {
@@ -166,7 +168,7 @@ class Player
 
     static void Explore(int currentRow, int currentCol)
     {
-        var exploreOptions = GetPossiblePoints();
+        var exploreOptions = GetPossiblePoints().OrderBy(x => DistanceScore(x, new Tuple<int, int>(currentRow, currentCol)));
         Deb($"Exploring from ({currentRow},{currentCol})");
         DebList(exploreOptions);
         foreach (var option in exploreOptions)
