@@ -38,19 +38,149 @@ class Player
     static Tuple<int, int> CenterPoint;
     #endregion
 
-    //static IEnumerable<Tuple<int,int>> getPossiblePoints()
-    //{
-    //    for (int i = 0; i < MAZE.GetLength(0); i++)
-    //    {
-    //        for (int j = 0; j < MAZE.GetLength(1); j++)
-    //        {
-    //            if(MAZE[i,j] == '.')
-    //            {
+    /// <summary>
+    /// Check if the bot can access the case
+    /// </summary>
+    static bool IsCaseAccessible(int i, int j) => (MAZE[i, j] != '#');
 
-    //            }
-    //        }
-    //    }
-    //}
+    /// <summary>
+    /// Gets all possible points to explore
+    /// </summary>
+    static IEnumerable<Tuple<int, int>> GetPossiblePoints()
+    {
+        for (int i = 0; i < MAZE.GetLength(0); i++)
+        {
+            for (int j = 0; j < MAZE.GetLength(1); j++)
+            {
+                if (MAZE[i, j] == '.' || MAZE[i, j] == 'T')
+                {
+                    if (i > 1 && MAZE[i - 1, j] == '?')
+                        yield return new Tuple<int, int>(i, j);
+                    if (i < MAZE.GetLength(0) - 2 && MAZE[i + 1, j] == '?')
+                        yield return new Tuple<int, int>(i, j);
+                    if (j > 1 && MAZE[i, j - 1] == '?')
+                        yield return new Tuple<int, int>(i, j);
+                    if (j < MAZE.GetLength(1) - 2 && MAZE[i, j + 1] == '?')
+                        yield return new Tuple<int, int>(i, j);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets a direction string between two points
+    /// </summary>
+    static string GetDirection(Tuple<int, int> from, Tuple<int, int> to)
+    {
+        if (from.Item1 == to.Item1)
+        {
+            if (from.Item2 < to.Item2)
+                return "RIGHT";
+            else
+                return "LEFT";
+        }
+        else
+        {
+            if (from.Item1 > to.Item1)
+                return "UP";
+            else
+                return "DOWN";
+        }
+    }
+
+    /// <summary>
+    /// Score a distance between 2 points for A* algo
+    /// </summary>
+    static double DistanceScore(Tuple<int, int> p1, Tuple<int, int> p2) => Math.Sqrt((p1.Item1 - p2.Item1) * (p1.Item1 - p2.Item1) + (p1.Item2 - p2.Item2) * (p1.Item2 - p2.Item2));
+
+    /// <summary>
+    /// Get add accessible neibors for a point
+    /// </summary>
+    static IEnumerable<Tuple<int, int>> GetAccessibleNeighbors(Tuple<int, int> p)
+    {
+        int i = p.Item1;
+        int j = p.Item2;
+        if (IsCaseAccessible(i, j))
+        {
+            if (i > 1 && IsCaseAccessible(i - 1, j))
+                yield return new Tuple<int, int>(i - 1, j);
+            if (i < MAZE.GetLength(0) - 2 && IsCaseAccessible(i + 1, j))
+                yield return new Tuple<int, int>(i + 1, j);
+            if (j > 1 && IsCaseAccessible(i, j - 1))
+                yield return new Tuple<int, int>(i, j - 1);
+            if (j < MAZE.GetLength(1) - 2 && IsCaseAccessible(i, j + 1))
+                yield return new Tuple<int, int>(i, j + 1);
+        }
+    }
+
+    /// <summary>
+    /// Implements A* to find the shortest way between two points
+    /// </summary>
+    static List<Tuple<int, int>> GetShortestWay(Tuple<int, int> from, Tuple<int, int> to)
+    {
+        bool pathFound = false;
+        var pathNodes = new List<Tuple<int, int>>();
+        var allNodes = new List<Tuple<int, int>>();
+        var cameFrom = new Dictionary<Tuple<int, int>, Tuple<int, int>>();
+        pathNodes.Add(from);
+        allNodes.Add(from);
+        Tuple<int, int> currentPoint = from;
+        while (pathNodes.Count > 0 && currentPoint != to)
+        {
+            Deb($"  [A*]: c p {currentPoint}. Dist {DistanceScore(to, currentPoint)}");
+            pathNodes.Remove(currentPoint);
+            var neiborNodes = GetAccessibleNeighbors(currentPoint);
+            foreach (var node in neiborNodes)
+            {
+                Deb($"  [A*]: adding neighbor {node}. Dist {DistanceScore(to, node)}");
+                if (!allNodes.Contains(node))
+                {
+                    cameFrom[node] = currentPoint;
+                    allNodes.Add(node);
+                    pathNodes.Add(node);
+                }
+            }
+            currentPoint = pathNodes.OrderBy(x => DistanceScore(x, to)).First();
+            if (currentPoint == to || DistanceScore(to, currentPoint) == 0)
+            {
+                Deb($"  [A*]: Got the target");
+                pathFound = true;
+                break;
+            }
+        }
+        if (!pathFound)
+            return null;
+        else
+        {
+            var path = new List<Tuple<int, int>>();
+            var currNode = to;
+            while (currNode != from)
+            {
+                path.Add(currNode);
+                currNode = cameFrom[currNode];
+            }
+            path.Reverse();
+            return path;
+        }
+    }
+
+    static void Explore(int currentRow, int currentCol)
+    {
+        var exploreOptions = GetPossiblePoints();
+        Deb($"Exploring from ({currentRow},{currentCol})");
+        DebList(exploreOptions);
+        foreach (var option in exploreOptions)
+        {
+            var path = GetShortestWay(new Tuple<int, int>(currentRow, currentCol), option);
+            if (path != null)
+            {
+                var nextPoint = path[0];
+                Deb($"Go explore to {nextPoint}");
+                Console.WriteLine(GetDirection(new Tuple<int, int>(currentRow, currentCol), nextPoint));
+                break;
+            }
+        }
+    }
 
     static void Main(string[] args)
     {
@@ -75,29 +205,46 @@ class Player
                     if (mazeRow[j] == 'T')
                         StartPoint = new Tuple<int, int>(i, j);
                     if (mazeRow[j] == 'C')
+                    {
                         CenterPoint = new Tuple<int, int>(i, j);
+                        if (currentRow == i && currentCol == j)
+                        {
+                            Deb($"The command center is found");
+                            FoundCommandCenter = true; // The command center is found
+                        }
+                    }
                 }
             }
             DebMaze(MAZE);
-            if (!FoundCommandCenter)
+            if (!FoundCommandCenter) // Explore
             {
-                // Explore
-                if (CenterPoint != null)
+                if (CenterPoint != null) // Go strait to command center
                 {
-                    // TODO: Goto C
+                    var path = GetShortestWay(new Tuple<int, int>(currentRow, currentCol), CenterPoint);
+                    if (path == null)
+                    {
+                        Deb("Can't reach center");
+                        Explore(currentRow, currentCol);
+                    }
+                    else
+                    {
+                        var nextPoint = path[0];
+                        Deb($"Go to center to {nextPoint}");
+                        Console.WriteLine(GetDirection(new Tuple<int, int>(currentRow, currentCol), nextPoint));
+                    }
                 }
                 else
                 {
-
+                    Explore(currentRow, currentCol);
                 }
             }
-            else
+            else // Get back
             {
-                // Get back
-                // TODO: Goto T
+                var path = GetShortestWay(new Tuple<int, int>(currentRow, currentCol), StartPoint);
+                var nextPoint = path[0];
+                Deb($"Go back to {nextPoint}");
+                Console.WriteLine(GetDirection(new Tuple<int, int>(currentRow, currentCol), nextPoint));
             }
-
-            Console.WriteLine("RIGHT"); // Kirk's next move (UP DOWN LEFT or RIGHT).
         }
     }
 }
