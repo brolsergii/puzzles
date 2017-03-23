@@ -23,7 +23,7 @@ namespace GenericPuzzleRunner
                 }
             };
             clientProc.Start();
-            TheLabyrinth.Run(ref clientProc, 14);
+            TheLabyrinth.Run(ref clientProc, 16);
             clientProc.Kill();
             Console.ReadKey();
         }

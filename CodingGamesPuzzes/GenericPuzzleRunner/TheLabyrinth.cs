@@ -14,7 +14,8 @@ namespace GenericPuzzleRunner
             {1, 15},
             {2, 15},
             {7, 15},
-            {14, 15}
+            {14, 15},
+            {16, 15}
         };
 
         static Dictionary<int, int> Cols = new Dictionary<int, int>
@@ -22,7 +23,8 @@ namespace GenericPuzzleRunner
             {1, 30},
             {2, 30},
             {7, 30},
-            {14, 30}
+            {14, 30},
+            {16, 30}
         };
 
         static Dictionary<int, int> Alarm = new Dictionary<int, int>
@@ -30,7 +32,8 @@ namespace GenericPuzzleRunner
             {1, 7},
             {2, 21},
             {7, 70},
-            {14, 33}
+            {14, 33},
+            {16, 71}
         };
 
         static Dictionary<int, Tuple<int, int>> Kirk = new Dictionary<int, Tuple<int, int>>
@@ -38,7 +41,8 @@ namespace GenericPuzzleRunner
             {1, new Tuple<int,int>(6,5) },
             {2, new Tuple<int,int>(2,25) },
             {7, new Tuple<int,int>(3,6) },
-            {14, new Tuple<int,int>(13,18) }
+            {14, new Tuple<int,int>(13,18) },
+            {16, new Tuple<int,int>(11,8) }
         };
 
         static Dictionary<int, char[][]> Maze = new Dictionary<int, char[][]>
@@ -116,6 +120,25 @@ namespace GenericPuzzleRunner
                     "##......#.#..###.............#".ToCharArray(),
                     "##...#######.###.######.####.#".ToCharArray(),
                     "##......##.......#T........###".ToCharArray(),
+                    "##############################".ToCharArray(),
+                 }
+            },
+            {16, new char[][]
+                 {
+                    "##############################".ToCharArray(),
+                    "#............................#".ToCharArray(),
+                    "#......####################..#".ToCharArray(),
+                    "#...C..#.....................#".ToCharArray(),
+                    "#...#..#..##..###............#".ToCharArray(),
+                    "###########################.##".ToCharArray(),
+                    "#.........##......##.....#...#".ToCharArray(),
+                    "#...####..##..##..##..#..#...#".ToCharArray(),
+                    "#.....##......##......#....###".ToCharArray(),
+                    "#.#######################.#..#".ToCharArray(),
+                    "#......#................#.#..#".ToCharArray(),
+                    "#......T................#.#..#".ToCharArray(),
+                    "#.#######################.#..#".ToCharArray(),
+                    "#............................#".ToCharArray(),
                     "##############################".ToCharArray(),
                  }
             }
