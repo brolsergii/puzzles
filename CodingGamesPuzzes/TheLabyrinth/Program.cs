@@ -138,12 +138,12 @@ public class Player
             var closestNodes = GetAccessibleNeighbors(currentPoint);
             foreach (var node in closestNodes)
             {
-                //Deb($"  [A*]: adding neighbor {node}. Dist {DistanceScore(to, node)}");
                 if (!cameFrom.ContainsKey(node) || nodeScore[currentPoint] < nodeScore[cameFrom[node]])
                 {
                     cameFrom[node] = currentPoint;
                     nodeScore[node] = nodeScore[currentPoint] + 1;
                 }
+                //Deb($"  [A*]: adding neighbor {node}. Dist {distCalc(to, node)}. Depth {nodeScore[node]}");
                 if (!allNodes.Contains(node))
                 {
                     allNodes.Add(node);
@@ -248,7 +248,8 @@ public class Player
                 if (CenterPoint != null) // Go strait to command center
                 {
                     var path = GetShortestWay(new Tuple<int, int>(currentRow, currentCol), CenterPoint, DistanceScore);
-                    if (path == null)
+                    var pathCenterToStart = GetShortestWay(CenterPoint, StartPoint, DistanceScore, true);
+                    if (path == null || pathCenterToStart == null)
                     {
                         Deb("Can't reach center");
                         Explore(currentRow, currentCol);
