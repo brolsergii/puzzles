@@ -68,13 +68,14 @@ class Solution
         sw.Start();
         int minTime = int.MaxValue;
         //var connections = connectivity.OrderByDescending(x => x.Value).Select(x => x.Key).ToArray();
-        var connections = connectivity.Where(x => x.Value > 1).Select(x => x.Key).ToArray();
-        for (int i = 0; i < connections.Count(); i++)
+        var connexions = connectivity.Where(x => x.Value > 1).Select(x => x.Key).ToArray();
+        Deb($"Go for {connexions.Count()} connextions");
+        for (int i = 0; i < connexions.Count(); i++)
         {
             var weights = new Dictionary<int, int>();
             var pathedNodes = new HashSet<int>();
             var waitingNodes = new HashSet<int>();
-            int firstNode = connections[i];
+            int firstNode = connexions[i];
             weights[firstNode] = 0;
             pathedNodes.Add(firstNode);
             waitingNodes.Add(firstNode);
@@ -82,6 +83,8 @@ class Solution
             {
                 int currentNode = waitingNodes.First();
                 waitingNodes.Remove(currentNode);
+                if (weights[currentNode] >= minTime)
+                    break; // no good results are possible
                 var closeNodes = pairConnections[currentNode];
                 foreach (var node in closeNodes)
                 {
