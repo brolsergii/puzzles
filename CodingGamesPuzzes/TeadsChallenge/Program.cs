@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 class Pair : IEquatable<Pair>
 {
@@ -40,6 +41,8 @@ class Solution
     {
         int n = int.Parse(Console.ReadLine()); // the number of adjacency relations
         Deb($"Starting with {n} pairs");
+        var sw = new Stopwatch();
+        sw.Start();
         for (int i = 0; i < n; i++)
         {
             string[] inputs = Console.ReadLine().Split(' ');
@@ -60,9 +63,12 @@ class Solution
             else
                 pairConnections[yi] = new List<int>(new int[] { xi });
         }
-
+        Deb($"Initial contruction during {sw.ElapsedTicks}");
+        sw.Reset();
+        sw.Start();
         int minTime = int.MaxValue;
-        var connections = connectivity.OrderByDescending(x => x.Value).Select(x => x.Key).ToArray();
+        //var connections = connectivity.OrderByDescending(x => x.Value).Select(x => x.Key).ToArray();
+        var connections = connectivity.Where(x => x.Value > 1).Select(x => x.Key).ToArray();
         for (int i = 0; i < connections.Count(); i++)
         {
             var weights = new Dictionary<int, int>();
@@ -91,6 +97,7 @@ class Solution
             if (tmpMinValue < minTime)
                 minTime = tmpMinValue;
         }
+        Deb($"Final calc during {sw.ElapsedTicks}");
 
         Console.WriteLine(minTime); // The minimal amount of steps required to completely propagate the advertisement
     }
