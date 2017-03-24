@@ -32,7 +32,8 @@ class Solution
     #region Global context
     static HashSet<Pair> pairs = new HashSet<Pair>();
     static HashSet<int> ids = new HashSet<int>();
-    static Dictionary<int, int> connectivity = new Dictionary<int, int>();
+    static Dictionary<int, int> connectivity = new Dictionary<int, int>(1024);
+    static Dictionary<int, List<int>> pairConnections = new Dictionary<int, List<int>>(1024);
     #endregion
 
     static void Main(string[] args)
@@ -44,17 +45,25 @@ class Solution
             string[] inputs = Console.ReadLine().Split(' ');
             int xi = int.Parse(inputs[0]); // the ID of a person which is adjacent to yi
             int yi = int.Parse(inputs[1]); // the ID of a person which is adjacent to xi
-            pairs.Add(new Pair(xi, yi));
-            pairs.Add(new Pair(yi, xi));
+            //pairs.Add(new Pair(xi, yi));
+            //pairs.Add(new Pair(yi, xi));
             ids.Add(xi);
             ids.Add(yi);
             connectivity[xi] = connectivity.ContainsKey(xi) ? connectivity[xi] + 1 : 1;
             connectivity[yi] = connectivity.ContainsKey(yi) ? connectivity[yi] + 1 : 1;
+            if (pairConnections.ContainsKey(xi))
+                pairConnections[xi].Add(yi);
+            else
+                pairConnections[xi] = new List<int>(new int[] { yi });
+            if (pairConnections.ContainsKey(yi))
+                pairConnections[yi].Add(xi);
+            else
+                pairConnections[yi] = new List<int>(new int[] { xi });
         }
 
         int minTime = int.MaxValue;
         var connections = connectivity.OrderByDescending(x => x.Value).Select(x => x.Key).ToArray();
-        for (int i = 0; i < connections.Count() / 3; i++)
+        for (int i = 0; i < connections.Count(); i++)
         {
             var weights = new Dictionary<int, int>();
             var pathedNodes = new HashSet<int>();
@@ -67,14 +76,14 @@ class Solution
             {
                 int currentNode = waitingNodes.First();
                 waitingNodes.Remove(currentNode);
-                var closeNodes = pairs.Where(x => x.x == currentNode);
+                var closeNodes = pairConnections[currentNode];
                 foreach (var node in closeNodes)
                 {
-                    if (!pathedNodes.Contains(node.y))
+                    if (!pathedNodes.Contains(node))
                     {
-                        weights[node.y] = weights[currentNode] + 1;
-                        waitingNodes.Add(node.y);
-                        pathedNodes.Add(node.y);
+                        weights[node] = weights[currentNode] + 1;
+                        waitingNodes.Add(node);
+                        pathedNodes.Add(node);
                     }
                 }
             }
