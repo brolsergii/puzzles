@@ -52,6 +52,8 @@ class Solution
             //pairs.Add(new Pair(yi, xi));
             ids.Add(xi);
             ids.Add(yi);
+            //if (i < 300)
+            //    Deb($"{xi} {yi}");
             connectivity[xi] = connectivity.ContainsKey(xi) ? connectivity[xi] + 1 : 1;
             connectivity[yi] = connectivity.ContainsKey(yi) ? connectivity[yi] + 1 : 1;
             if (pairConnections.ContainsKey(xi))

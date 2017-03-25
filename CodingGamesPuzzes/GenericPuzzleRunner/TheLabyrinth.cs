@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace GenericPuzzleRunner
 {
-    public class TheLabyrinth
+    public class TheLabyrinth : Runner
     {
-        static Dictionary<int, int> Rows = new Dictionary<int, int>
+        Dictionary<int, int> Rows = new Dictionary<int, int>
         {
             {1, 15},
             {2, 15},
@@ -18,7 +18,7 @@ namespace GenericPuzzleRunner
             {16, 15}
         };
 
-        static Dictionary<int, int> Cols = new Dictionary<int, int>
+        Dictionary<int, int> Cols = new Dictionary<int, int>
         {
             {1, 30},
             {2, 30},
@@ -27,7 +27,7 @@ namespace GenericPuzzleRunner
             {16, 30}
         };
 
-        static Dictionary<int, int> Alarm = new Dictionary<int, int>
+        Dictionary<int, int> Alarm = new Dictionary<int, int>
         {
             {1, 7},
             {2, 21},
@@ -36,7 +36,7 @@ namespace GenericPuzzleRunner
             {16, 71}
         };
 
-        static Dictionary<int, Tuple<int, int>> Kirk = new Dictionary<int, Tuple<int, int>>
+        Dictionary<int, Tuple<int, int>> Kirk = new Dictionary<int, Tuple<int, int>>
         {
             {1, new Tuple<int,int>(6,5) },
             {2, new Tuple<int,int>(2,25) },
@@ -45,7 +45,7 @@ namespace GenericPuzzleRunner
             {16, new Tuple<int,int>(11,8) }
         };
 
-        static Dictionary<int, char[][]> Maze = new Dictionary<int, char[][]>
+        Dictionary<int, char[][]> Maze = new Dictionary<int, char[][]>
         {
             {1, new char[][]
                     {
@@ -144,19 +144,12 @@ namespace GenericPuzzleRunner
             }
         };
 
-        #region I/O helpers
-        static Process proc;
-        static void OutWrite(object o) => proc.StandardInput.Write(o);
-        static void OutWriteLine(object o) => proc.StandardInput.WriteLine(o);
-        static string ReadLine() => proc.StandardOutput.ReadLine();
-        #endregion
+        int MaxFuel = 1200;
+        bool CheckTerminal = false;
+        bool GameEnd = false;
+        bool[,] MazeMask;
 
-        static int MaxFuel = 1200;
-        static bool CheckTerminal = false;
-        static bool GameEnd = false;
-        static bool[,] MazeMask;
-
-        public static void UpdateMazeMask(int m, int n)
+        public void UpdateMazeMask(int m, int n)
         {
             for (int i = m - 2; i <= m + 2; i++)
                 for (int j = n - 2; j <= n + 2; j++)
@@ -166,7 +159,7 @@ namespace GenericPuzzleRunner
                 }
         }
 
-        public static void ShowMazeMapRow(int testId, int row)
+        public void ShowMazeMapRow(int testId, int row)
         {
             for (int i = 0; i < Maze[testId][row].Length; i++)
             {
@@ -178,7 +171,7 @@ namespace GenericPuzzleRunner
             OutWriteLine("");
         }
 
-        public static void Run(ref Process clientProc, int testId)
+        public override void Run(ref Process clientProc, int testId)
         {
             proc = clientProc;
             OutWriteLine($"{Rows[testId]} {Cols[testId]} {Alarm[testId]}");
