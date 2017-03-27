@@ -12,7 +12,7 @@ class Pair : IEquatable<Pair>
     public int x;
     public int y;
     public bool Equals(Pair obj) => obj.x == x && obj.y == y;
-    public override int GetHashCode() => (x << 16) + y;
+    public override int GetHashCode() => x + y; // (x,y) == (y,x)
 }
 
 class Solution
@@ -31,10 +31,9 @@ class Solution
     #endregion
 
     #region Global context
-    static HashSet<Pair> pairs = new HashSet<Pair>();
     static HashSet<int> ids = new HashSet<int>();
-    static Dictionary<int, int> connectivity = new Dictionary<int, int>(1024);
-    static Dictionary<int, List<int>> pairConnections = new Dictionary<int, List<int>>(1024);
+    static Dictionary<int, int> connectivity = new Dictionary<int, int>(1024 * 32);
+    static Dictionary<int, List<int>> pairConnections = new Dictionary<int, List<int>>(1024 * 32);
     #endregion
 
     static void Main(string[] args)
@@ -48,8 +47,6 @@ class Solution
             string[] inputs = Console.ReadLine().Split(' ');
             int xi = int.Parse(inputs[0]); // the ID of a person which is adjacent to yi
             int yi = int.Parse(inputs[1]); // the ID of a person which is adjacent to xi
-            //pairs.Add(new Pair(xi, yi));
-            //pairs.Add(new Pair(yi, xi));
             ids.Add(xi);
             ids.Add(yi);
             connectivity[xi] = connectivity.ContainsKey(xi) ? connectivity[xi] + 1 : 1;
@@ -67,19 +64,23 @@ class Solution
         sw.Reset();
         sw.Start();
         int minTime = int.MaxValue;
-        //var connections = connectivity.OrderByDescending(x => x.Value).Select(x => x.Key).ToArray();
+        //var connexions = connectivity.Where(x => x.Value > 1).OrderByDescending(x => x.Value).Select(x => x.Key).ToArray();
+        //var connexions = connectivity.Where(x => x.Value > 1).OrderBy(x => x.Value).Select(x => x.Key).ToArray();
         var connexions = connectivity.Where(x => x.Value > 1).Select(x => x.Key).ToArray();
-        Deb($"Go for {connexions.Count()} connextions");
-        for (int i = 0; i < connexions.Count(); i++)
+        int connexionsNumber = connexions.Count();
+        Deb($"Go for {connexionsNumber} connextions");
+        Dictionary<int, int> weights;
+        HashSet<int> waitingNodes;
+        Dictionary<Pair, int> distances = new Dictionary<Pair, int>(1024 * 32);
+        for (int i = 0; i < connexionsNumber; i++)
         {
-            var weights = new Dictionary<int, int>();
-            var pathedNodes = new HashSet<int>();
-            var waitingNodes = new HashSet<int>();
+            int tmpMinWeight = int.MinValue;
+            weights = new Dictionary<int, int>(1024);
+            waitingNodes = new HashSet<int>();
             int firstNode = connexions[i];
             weights[firstNode] = 0;
-            pathedNodes.Add(firstNode);
             waitingNodes.Add(firstNode);
-            while (pathedNodes.Count != ids.Count)
+            while (waitingNodes.Count > 0)
             {
                 int currentNode = waitingNodes.First();
                 waitingNodes.Remove(currentNode);
@@ -88,17 +89,23 @@ class Solution
                 var closeNodes = pairConnections[currentNode];
                 foreach (var node in closeNodes)
                 {
-                    if (!pathedNodes.Contains(node))
+                    if (!weights.ContainsKey(node))
                     {
-                        weights[node] = weights[currentNode] + 1;
+                        int newWeight = weights[currentNode] + 1;
+                        weights.Add(node, newWeight);
+                        if (tmpMinWeight < newWeight)
+                            tmpMinWeight = newWeight;
                         waitingNodes.Add(node);
-                        pathedNodes.Add(node);
+                        var pair = new Pair(firstNode, node);
+                        if (!distances.ContainsKey(pair))
+                        {
+                            distances.Add(pair, newWeight);
+                        }
                     }
                 }
             }
-            int tmpMinValue = weights.Max(x => x.Value);
-            if (tmpMinValue < minTime)
-                minTime = tmpMinValue;
+            if (tmpMinWeight < minTime)
+                minTime = tmpMinWeight;
         }
         Deb($"Final calc during {sw.ElapsedTicks}");
 
