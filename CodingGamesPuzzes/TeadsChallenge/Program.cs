@@ -49,6 +49,8 @@ class Solution
             int yi = int.Parse(inputs[1]); // the ID of a person which is adjacent to xi
             ids.Add(xi);
             ids.Add(yi);
+            //if (i >= 0 && i < 100)
+            //    Deb($"new int[]{{{xi},{yi}}},");
             connectivity[xi] = connectivity.ContainsKey(xi) ? connectivity[xi] + 1 : 1;
             connectivity[yi] = connectivity.ContainsKey(yi) ? connectivity[yi] + 1 : 1;
             if (pairConnections.ContainsKey(xi))
