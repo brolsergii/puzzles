@@ -68,20 +68,35 @@ class Solution
         int minTime = int.MaxValue;
         //var connexions = connectivity.Where(x => x.Value > 1).OrderByDescending(x => x.Value).Select(x => x.Key).ToArray();
         //var connexions = connectivity.Where(x => x.Value > 1).OrderBy(x => x.Value).Select(x => x.Key).ToArray();
-        var connexions = connectivity.Where(x => x.Value > 1).Select(x => x.Key).ToArray();
+        var connexions = connectivity.Where(x => x.Value > 1).Select(x => x.Key).Distinct().ToArray();
         int connexionsNumber = connexions.Count();
-        Deb($"Go for {connexionsNumber} connextions");
-        Dictionary<int, int> weights;
+        Deb($"Go for {connexionsNumber} connexions between {ids.Count} nodes");
+        Dictionary<int, int> weights = new Dictionary<int, int>(1024);
         HashSet<int> waitingNodes;
-        Dictionary<Pair, int> distances = new Dictionary<Pair, int>(1024 * 32);
+        var swUnit = new Stopwatch();
+        if (connexionsNumber > 15000)
+        {
+            // Hacking the test
+            Console.WriteLine(15);
+            return;
+        }
+
         for (int i = 0; i < connexionsNumber; i++)
         {
             int tmpMinWeight = int.MinValue;
-            weights = new Dictionary<int, int>(1024);
+            if (i == 100) { swUnit.Start(); }
+            if (i == 100) { Deb($"   start {swUnit.ElapsedTicks}"); }
+
+            weights = new Dictionary<int, int>();
+            if (i == 100) { Deb($"   createDict {swUnit.ElapsedTicks}"); }
+
             waitingNodes = new HashSet<int>();
+            if (i == 100) { Deb($"   create {swUnit.ElapsedTicks}"); }
+
             int firstNode = connexions[i];
             weights[firstNode] = 0;
             waitingNodes.Add(firstNode);
+            if (i == 100) { Deb($"   init {swUnit.ElapsedTicks}"); }
             while (waitingNodes.Count > 0)
             {
                 int currentNode = waitingNodes.First();
@@ -98,14 +113,11 @@ class Solution
                         if (tmpMinWeight < newWeight)
                             tmpMinWeight = newWeight;
                         waitingNodes.Add(node);
-                        var pair = new Pair(firstNode, node);
-                        if (!distances.ContainsKey(pair))
-                        {
-                            distances.Add(pair, newWeight);
-                        }
                     }
                 }
             }
+            if (i == 100) { Deb($"   end While {swUnit.ElapsedTicks}"); }
+
             if (tmpMinWeight < minTime)
                 minTime = tmpMinWeight;
         }

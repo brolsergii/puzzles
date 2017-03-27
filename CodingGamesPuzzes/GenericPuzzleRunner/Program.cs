@@ -11,7 +11,7 @@ namespace GenericPuzzleRunner
     {
         static void Main(string[] args)
         {
-            RunTeadsChellenge(9);
+            RunTeadsChellenge(5);
             Console.ReadKey();
         }
 
