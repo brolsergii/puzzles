@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenericPuzzleRunner", "Gene
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeadsChallenge", "TeadsChallenge\TeadsChallenge.csproj", "{F6E94A34-6E2D-427C-9735-038E57034DC0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LaBataille", "LaBataille\LaBataille.csproj", "{89F624F9-1753-4F3C-9795-C99553953B25}"
+EndProject
 Global
 	GlobalSection(Performance) = preSolution
 		HasPerformanceSessions = true
@@ -30,6 +32,10 @@ Global
 		{F6E94A34-6E2D-427C-9735-038E57034DC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F6E94A34-6E2D-427C-9735-038E57034DC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F6E94A34-6E2D-427C-9735-038E57034DC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89F624F9-1753-4F3C-9795-C99553953B25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89F624F9-1753-4F3C-9795-C99553953B25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89F624F9-1753-4F3C-9795-C99553953B25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89F624F9-1753-4F3C-9795-C99553953B25}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
