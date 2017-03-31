@@ -135,7 +135,7 @@ class Solution
             Point nextPos;
             string direction = "";
             nextPos = GetNextPos(CurrentPosition, CurrentDirection, ref direction);
-            Deb($"Next {nextPos}");
+            Deb($"Next {nextPos}: {Gmap[nextPos.x, nextPos.y]}");
             switch (Gmap[nextPos.x, nextPos.y])
             {
                 case 'X':
@@ -143,6 +143,7 @@ class Solution
                         //Deb($"{numberOfSteps}: X");
                         if (Destroyer)
                         {
+                            Gmap[nextPos.x, nextPos.y] = ' '; // The wall is down
                             CurrentPosition = nextPos;
                             result.Add(direction);
                         }
@@ -150,7 +151,7 @@ class Solution
                         {
                             for (int i = 0; i < 4; i++)
                             {
-                                ChangeDirection(i==0);
+                                ChangeDirection(i == 0);
                                 string usless = "";
                                 nextPos = GetNextPos(CurrentPosition, CurrentDirection, ref usless);
                                 if (Gmap[nextPos.x, nextPos.y] != '#' && (Gmap[nextPos.x, nextPos.y] != 'X' || Destroyer))
@@ -234,7 +235,7 @@ class Solution
                         break;
                     }
             }
-            if (numberOfSteps > 1000)
+            if (numberOfSteps > 5000)
             {
                 Deb("Looped");
                 DebList(result);
