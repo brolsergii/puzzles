@@ -56,18 +56,54 @@ class Solution
     static bool Inverted = false;
     #endregion
 
-    static void ChangeDirection()
+    static void ChangeDirection(bool init)
     {
         if (Inverted)
         {
-            CurrentDirection--;
-            if ((int)CurrentDirection < 0) { CurrentDirection = Direction.W; }
+            if (init)
+                CurrentDirection = Direction.W;
+            else
+            {
+                CurrentDirection--;
+                if ((int)CurrentDirection < 0) { CurrentDirection = Direction.W; }
+            }
         }
         else
         {
-            CurrentDirection++;
-            if ((int)CurrentDirection > 3) { CurrentDirection = Direction.S; }
+            if (init)
+                CurrentDirection = Direction.S;
+            else
+            {
+                CurrentDirection++;
+                if ((int)CurrentDirection > 3) { CurrentDirection = Direction.S; }
+            }
         }
+    }
+
+    static Point GetNextPos(Point old, Direction dir, ref string direction)
+    {
+        Point nextPos;
+        if (CurrentDirection == Direction.S)
+        {
+            nextPos = new Point(CurrentPosition.x + 1, CurrentPosition.y);
+            direction = "SOUTH";
+        }
+        else if (CurrentDirection == Direction.E)
+        {
+            nextPos = new Point(CurrentPosition.x, CurrentPosition.y + 1);
+            direction = "EAST";
+        }
+        else if (CurrentDirection == Direction.N)
+        {
+            nextPos = new Point(CurrentPosition.x - 1, CurrentPosition.y);
+            direction = "NORTH";
+        }
+        else // (CurrentDirection == Direction.W)
+        {
+            nextPos = new Point(CurrentPosition.x, CurrentPosition.y - 1);
+            direction = "WEST";
+        }
+        return nextPos;
     }
 
     static void Main(string[] args)
@@ -98,42 +134,41 @@ class Solution
             numberOfSteps++;
             Point nextPos;
             string direction = "";
-            if (CurrentDirection == Direction.S)
-            {
-                nextPos = new Point(CurrentPosition.x, CurrentPosition.y + 1);
-                direction = "SOUTH";
-            }
-            else if (CurrentDirection == Direction.E)
-            {
-                nextPos = new Point(CurrentPosition.x + 1, CurrentPosition.y);
-                direction = "EAST";
-            }
-            else if (CurrentDirection == Direction.N)
-            {
-                nextPos = new Point(CurrentPosition.x, CurrentPosition.y - 1);
-                direction = "NORTH";
-            }
-            else // (CurrentDirection == Direction.W)
-            {
-                nextPos = new Point(CurrentPosition.x - 1, CurrentPosition.y);
-                direction = "WEST";
-            }
+            nextPos = GetNextPos(CurrentPosition, CurrentDirection, ref direction);
+            Deb($"Next {nextPos}");
             switch (Gmap[nextPos.x, nextPos.y])
             {
                 case 'X':
                     {
+                        //Deb($"{numberOfSteps}: X");
                         if (Destroyer)
                         {
                             CurrentPosition = nextPos;
                             result.Add(direction);
                         }
                         else
-                            ChangeDirection();
+                        {
+                            for (int i = 0; i < 4; i++)
+                            {
+                                ChangeDirection(i==0);
+                                string usless = "";
+                                nextPos = GetNextPos(CurrentPosition, CurrentDirection, ref usless);
+                                if (Gmap[nextPos.x, nextPos.y] != '#' && (Gmap[nextPos.x, nextPos.y] != 'X' || Destroyer))
+                                    break;
+                            }
+                        }
                         break;
                     }
                 case '#':
                     {
-                        ChangeDirection();
+                        for (int i = 0; i < 4; i++)
+                        {
+                            ChangeDirection(i == 0);
+                            string usless = "";
+                            nextPos = GetNextPos(CurrentPosition, CurrentDirection, ref usless);
+                            if (Gmap[nextPos.x, nextPos.y] != '#' && (Gmap[nextPos.x, nextPos.y] != 'X' || Destroyer))
+                                break;
+                        }
                         break;
                     }
                 case '$':
@@ -201,13 +236,13 @@ class Solution
             }
             if (numberOfSteps > 1000)
             {
-                Deb("Bellll");
+                Deb("Looped");
                 DebList(result);
                 end = true;
                 result.Clear();
                 result.Add("LOOP");
             }
-            
+
         }
         foreach (var step in result)
             Console.Out.WriteLine(step);
