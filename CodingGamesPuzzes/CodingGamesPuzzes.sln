@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheLabyrinth", "TheLabyrinth\TheLabyrinth.csproj", "{9F4BEA05-65EF-4861-9917-81C07A22C3E4}"
 EndProject
@@ -12,6 +12,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LaBataille", "LaBataille\LaBataille.csproj", "{89F624F9-1753-4F3C-9795-C99553953B25}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bender1", "Bender1\Bender1.csproj", "{078DC6D5-3248-4919-AF36-8C429484A567}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LaResistance", "LaResistance\LaResistance.csproj", "{440DFC14-37A4-406D-89D0-C9A2849E765A}"
 EndProject
 Global
 	GlobalSection(Performance) = preSolution
@@ -42,6 +44,10 @@ Global
 		{078DC6D5-3248-4919-AF36-8C429484A567}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{078DC6D5-3248-4919-AF36-8C429484A567}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{078DC6D5-3248-4919-AF36-8C429484A567}.Release|Any CPU.Build.0 = Release|Any CPU
+		{440DFC14-37A4-406D-89D0-C9A2849E765A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{440DFC14-37A4-406D-89D0-C9A2849E765A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{440DFC14-37A4-406D-89D0-C9A2849E765A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{440DFC14-37A4-406D-89D0-C9A2849E765A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
